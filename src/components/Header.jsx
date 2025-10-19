@@ -5,10 +5,10 @@ import { useCart } from '../context/CartContext';
 
 const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const { cart } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
   const itemCount = cart.reduce((acc, item) => acc + item.qty, 0);
   const total = cart
-    .reduce((acc, item) => acc + item.price * item.qry, 0)
+    .reduce((acc, item) => acc + item.price * item.qty, 0)
     .toFixed(2);
 
   return (
@@ -45,18 +45,28 @@ const Header = () => {
                         <div>
                           <p className="font-semibold">{item.name}</p>
                           <p className="text-sm text-gray-500">
-                            {item.qty} x {item.price}
+                            {item.qty} x ${item.price}
                           </p>
                         </div>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-sm text-red-500 hover:underline"
+                        >
+                          Remove
+                        </button>
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-5 flex justify-between font-semibold">
-                    <span>
-                      Total:
-                      <span>{total}</span>
-                    </span>
+                  <div className="mt-4 flex justify-between font-semibold">
+                    <span>Total:</span>
+                    <span>${total}</span>
                   </div>
+                  <button
+                    onClick={clearCart}
+                    className="mt-3 w-full bg-red-500 text-white py-1 rounded transition hover:bg-red-600"
+                  >
+                    Clear Cart
+                  </button>
                 </>
               )}
             </div>

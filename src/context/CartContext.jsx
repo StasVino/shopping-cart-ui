@@ -3,8 +3,14 @@ import { createContext, useState, useEffect, useContext } from 'react';
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const stored = localStorage.getItem('cart');
+    return stored ? JSON.parse(stored) : [];
+  });
 
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
   const addToCart = (product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -17,27 +23,16 @@ export function CartProvider({ children }) {
     });
   };
 
-  // useEffect(() => {
-  //   const fetchCart = async () => {
-  //     try {
-  //       const res = await fetch('api/cart');
-  //       if (!res.ok) {
-  //         throw new Error('Faild to Fetch cart');
-  //       }
-  //       const data = await res.json();
-  //       setCart(data);
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
 
-  //   fetchCart();
-  // }, []);
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );
